@@ -12,19 +12,14 @@ owner_nsid = photoset.attrib['owner']
 count = photoset.attrib['photos']
 index_len = len(count)
 
-print('%s photos in total' % count)
+print(f'{count} photos in total')
 
-processes = []
-counter = 0
-
-for photo in fr.walk_set(photoset_id):
-    counter += 1
-    label = 'flickr.com_' + owner_nsid + '-' + photoset_id + '-' + str(counter).zfill(index_len)
-    photo_id = photo.get('id')
-    sizes = fr.photos_getSizes(photo_id=photo_id)
+for i, photo in enumerate(fr.walk_set(photoset_id), start=1):
+    sizes = fr.photos_getSizes(photo_id=photo.get('id'))
     photo_uri = sizes.find('sizes').findall('size')[-1].attrib['source']  # 'Original' is always the last size
-    extension = photo_uri.split('.')[-1]
-    filename = label + '.' + extension
 
-    urllib.request.urlretrieve(photo_uri, "images\\%s" % filename)
-    print("Saved photo %i of %s: %s" % (counter, count, photo_uri))
+    extension = photo_uri.split('.')[-1]
+    filename = f'flickr.com_{owner_nsid}-{photoset_id}-{str(i).zfill(index_len)}.{extension}'
+
+    urllib.request.urlretrieve(photo_uri, f"images\\{filename}")
+    print(f"Saved photo {i} of {count}: {photo_uri}")
